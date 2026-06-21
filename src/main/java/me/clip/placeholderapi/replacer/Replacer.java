@@ -34,10 +34,6 @@ public interface Replacer {
     String apply(@NotNull final String text, @Nullable final OfflinePlayer player,
                  @NotNull final Function<String, @Nullable PlaceholderExpansion> lookup);
 
-    @NotNull
-    String applyRelational(@NotNull final String text, @Nullable final Player one, @Nullable final Player two,
-                           @NotNull final Function<String, @Nullable PlaceholderExpansion> lookup);
-
     enum Closure {
         BRACKET('{', '}'),
         PERCENT('%', '%');
