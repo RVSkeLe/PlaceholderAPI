@@ -24,6 +24,7 @@ import java.util.function.Function;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +34,9 @@ public interface Replacer {
     String apply(@NotNull final String text, @Nullable final OfflinePlayer player,
                  @NotNull final Function<String, @Nullable PlaceholderExpansion> lookup);
 
+    @NotNull
+    String applyRelational(@NotNull final String text, @Nullable final Player one, @Nullable final Player two,
+                           @NotNull final Function<String, @Nullable PlaceholderExpansion> lookup);
 
     enum Closure {
         BRACKET('{', '}'),
