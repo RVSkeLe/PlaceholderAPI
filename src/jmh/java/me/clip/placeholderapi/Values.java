@@ -23,6 +23,7 @@ package me.clip.placeholderapi;
 import com.google.common.collect.ImmutableMap;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.clip.placeholderapi.replacer.CharsReplacer;
+import me.clip.placeholderapi.replacer.Closure;
 import me.clip.placeholderapi.replacer.OldCharsReplacer;
 import me.clip.placeholderapi.replacer.Replacer;
 import org.bukkit.OfflinePlayer;
@@ -39,8 +40,8 @@ public interface Values {
             .build();
 
 
-    Replacer CHARS_REPLACER = new CharsReplacer(Replacer.Closure.PERCENT);
-    Replacer OLD_CHARS_REPLACER = new OldCharsReplacer(Replacer.Closure.PERCENT);
+    Replacer CHARS_REPLACER = new CharsReplacer(Closure.PERCENT);
+    Replacer OLD_CHARS_REPLACER = new OldCharsReplacer(Closure.PERCENT);
 
     final class MockPlayerPlaceholderExpansion extends PlaceholderExpansion {
 

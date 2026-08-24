@@ -21,16 +21,16 @@
 package me.clip.placeholderapi;
 
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import me.clip.placeholderapi.expansion.Relational;
 import me.clip.placeholderapi.expansion.manager.LocalExpansionManager;
 import me.clip.placeholderapi.replacer.CharsReplacer;
+import me.clip.placeholderapi.replacer.RelationalCharsReplacer;
+import me.clip.placeholderapi.replacer.RelationalReplacer;
 import me.clip.placeholderapi.replacer.Replacer;
-import me.clip.placeholderapi.replacer.Replacer.Closure;
+import me.clip.placeholderapi.replacer.Closure;
 import me.clip.placeholderapi.util.Msg;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -42,6 +42,7 @@ public final class PlaceholderAPI {
 
     private static final Replacer REPLACER_PERCENT = new CharsReplacer(Closure.PERCENT);
     private static final Replacer REPLACER_BRACKET = new CharsReplacer(Closure.BRACKET);
+    private static final RelationalReplacer REPLACER_RELATIONAL = new RelationalCharsReplacer(Closure.PERCENT);
 
     static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("[%]([^%]+)[%]");
     static final Pattern BRACKET_PLACEHOLDER_PATTERN = Pattern.compile("[{]([^{}]+)[}]");
@@ -182,33 +183,8 @@ public final class PlaceholderAPI {
      * @return The text containing the parsed relational placeholders
      */
     public static String setRelationalPlaceholders(final Player one, final Player two, @NotNull String text) {
-        final Matcher matcher = RELATIONAL_PLACEHOLDER_PATTERN.matcher(text);
-
-        while (matcher.find()) {
-            final String format = matcher.group(2);
-            final int index = format.indexOf('_');
-
-            if (index <= 0) {
-                continue;
-            }
-
-            String identifier = format.substring(0, index).toLowerCase(Locale.ROOT);
-            String params = format.substring(index + 1);
-            final PlaceholderExpansion expansion = PlaceholderAPIPlugin.getInstance()
-                    .getLocalExpansionManager().getExpansion(identifier);
-
-            if (!(expansion instanceof Relational)) {
-                continue;
-            }
-
-            final String value = ((Relational) expansion).onPlaceholderRequest(one, two, params);
-
-            if (value != null) {
-                text = text.replaceAll(Pattern.quote(matcher.group()), Matcher.quoteReplacement(value));
-            }
-        }
-
-        return text;
+        return REPLACER_RELATIONAL.apply(text, one, two,
+                PlaceholderAPIPlugin.getInstance().getLocalExpansionManager()::getExpansion);
     }
 
     /**
@@ -265,15 +241,6 @@ public final class PlaceholderAPI {
      */
     public static Pattern getBracketPlaceholderPattern() {
         return BRACKET_PLACEHOLDER_PATTERN;
-    }
-
-    /**
-     * Get the relational placeholder pattern.
-     *
-     * @return Regex Pattern of {@literal [%](rel_)([^%]+)[%]}
-     */
-    public static Pattern getRelationalPlaceholderPattern() {
-        return RELATIONAL_PLACEHOLDER_PATTERN;
     }
 
     /**

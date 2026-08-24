@@ -24,6 +24,7 @@ import static me.clip.placeholderapi.Values.MockPlayerPlaceholderExpansion.PLAYE
 import static me.clip.placeholderapi.Values.MockPlayerPlaceholderExpansion.PLAYER_X;
 import static me.clip.placeholderapi.Values.MockPlayerPlaceholderExpansion.PLAYER_Y;
 import static me.clip.placeholderapi.Values.MockPlayerPlaceholderExpansion.PLAYER_Z;
+import static me.clip.placeholderapi.Values.MockRelationalPlaceholderExpansion.RELATION_STATUS;
 import static me.clip.placeholderapi.Values.MockPlayerPlaceholderExpansion.EMPTY_ARGUMENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -71,6 +72,78 @@ public final class ReplacerUnitTester {
         final String text = "10% and %hello world 15%";
 
         assertEquals(text, Values.CHARS_REPLACER.apply(text, null, Values.PLACEHOLDERS::get));
+    }
+
+    @Test
+    void testRelationalReplacerProducesExpectedSingleValue() {
+        assertEquals(RELATION_STATUS, Values.RELATIONAL_REPLACER
+                .apply("%rel_viewer_status%", null, null, Values.PLACEHOLDERS::get));
+    }
+
+    @Test
+    void relationalReplacerParsesPlaceholdersWithOneArgumentThatIsEmpty() {
+        assertEquals(Values.MockRelationalPlaceholderExpansion.EMPTY_ARGUMENT, Values.RELATIONAL_REPLACER
+                .apply("%rel_viewer_%", null, null, Values.PLACEHOLDERS::get));
+    }
+
+    @Test
+    void relationalReplacerDoesNotParseNormalPlaceholders() {
+        final String text = "%viewer_status%";
+
+        assertEquals(text, Values.RELATIONAL_REPLACER
+                .apply(text, null, null, Values.PLACEHOLDERS::get));
+    }
+
+    @Test
+    void relationalReplacerDoesNotParseNonRelationalExpansions() {
+        final String text = "%rel_player_name%";
+
+        assertEquals(text, Values.RELATIONAL_REPLACER
+                .apply(text, null, null, Values.PLACEHOLDERS::get));
+    }
+
+    @Test
+    void relationalReplacerDoesNotParseEmptyIdentifiers() {
+        final String text = "%rel__status%";
+
+        assertEquals(text, Values.RELATIONAL_REPLACER
+                .apply(text, null, null, Values.PLACEHOLDERS::get));
+    }
+
+    @Test
+    void relationalReplacerParsesPlaceholderInsideText() {
+        assertEquals("Status: " + RELATION_STATUS, Values.RELATIONAL_REPLACER
+                .apply("Status: %rel_viewer_status%", null, null, Values.PLACEHOLDERS::get));
+    }
+
+    @Test
+    void relationalReplacerParsesMultiplePlaceholders() {
+        assertEquals(RELATION_STATUS + " " + RELATION_STATUS, Values.RELATIONAL_REPLACER
+                .apply("%rel_viewer_status% %rel_viewer_status%", null, null, Values.PLACEHOLDERS::get));
+    }
+
+    @Test
+    void relationalReplacerPreservesUnknownPlaceholder() {
+        final String text = "%rel_viewer_unknown%";
+
+        assertEquals(text, Values.RELATIONAL_REPLACER
+                .apply(text, null, null, Values.PLACEHOLDERS::get));
+    }
+
+    @Test
+    void relationalReplacerPreservesMalformedPlaceholderWithoutTail() {
+        final String text = "%rel_viewer_status";
+
+        assertEquals(text, Values.RELATIONAL_REPLACER
+                .apply(text, null, null, Values.PLACEHOLDERS::get));
+    }
+
+    @Test
+    void relationalReplacerPreservesPlaceholderWithoutIdentifierSeparator() {
+        final String text = "%rel_viewer%";
+
+        assertEquals(text, Values.RELATIONAL_REPLACER
+                .apply(text, null, null, Values.PLACEHOLDERS::get));
     }
 
 }

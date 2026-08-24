@@ -21,16 +21,15 @@
 package me.clip.placeholderapi.replacer;
 
 import java.util.function.Function;
-
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface Replacer {
+public interface RelationalReplacer {
 
     @NotNull
-    String apply(@NotNull final String text, @Nullable final OfflinePlayer player,
+    String apply(@NotNull final String text, @Nullable final Player one, @Nullable final Player two,
                  @NotNull final Function<String, @Nullable PlaceholderExpansion> lookup);
 
 }

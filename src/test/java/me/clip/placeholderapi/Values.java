@@ -22,9 +22,10 @@ package me.clip.placeholderapi;
 
 import com.google.common.collect.ImmutableMap;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import me.clip.placeholderapi.replacer.CharsReplacer;
-import me.clip.placeholderapi.replacer.Replacer;
+import me.clip.placeholderapi.expansion.Relational;
+import me.clip.placeholderapi.replacer.Closure;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,10 +38,12 @@ public interface Values {
 
     ImmutableMap<String, PlaceholderExpansion> PLACEHOLDERS = ImmutableMap.<String, PlaceholderExpansion>builder()
             .put("player", new MockPlayerPlaceholderExpansion())
+            .put("viewer", new MockRelationalPlaceholderExpansion())
             .build();
 
 
-    Replacer CHARS_REPLACER = new CharsReplacer(Replacer.Closure.PERCENT);
+    CharsReplacer CHARS_REPLACER = new CharsReplacer(Closure.PERCENT);
+    RelationalReplacer RELATIONAL_REPLACER = new RelationalCharsReplacer(Closure.PERCENT);
 
 
     final class MockPlayerPlaceholderExpansion extends PlaceholderExpansion {
@@ -93,6 +96,43 @@ public interface Values {
             return null;
         }
 
+    }
+
+    final class MockRelationalPlaceholderExpansion extends PlaceholderExpansion implements Relational {
+
+        public static final String RELATION_STATUS = "friendly";
+        public static final String EMPTY_ARGUMENT = "empty relation argument";
+
+        @NotNull
+        @Override
+        public String getIdentifier() {
+            return "viewer";
+        }
+
+        @NotNull
+        @Override
+        public String getAuthor() {
+            return "Sxtanna";
+        }
+
+        @NotNull
+        @Override
+        public String getVersion() {
+            return "1.0";
+        }
+
+        @Override
+        public String onPlaceholderRequest(final Player one, final Player two,
+                                           final String identifier) {
+            switch (identifier) {
+                case "status":
+                    return RELATION_STATUS;
+                case "":
+                    return EMPTY_ARGUMENT;
+            }
+
+            return null;
+        }
     }
 
 }
